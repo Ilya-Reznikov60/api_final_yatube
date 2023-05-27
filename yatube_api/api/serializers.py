@@ -1,10 +1,8 @@
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
-from rest_framework.validators import UniqueTogetherValidator
 
 from api.constants import (
-    ERROR_MESSAGE_ON_HIMSELF,
-    ERROR_MESSAGE_ALREADY_SIGNED
+    ERROR_MESSAGE_ON_HIMSELF
 )
 
 from posts.models import Group, Comment, Post, User, Follow
@@ -59,10 +57,3 @@ class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Follow
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Follow.objects.all(),
-                fields=['user', 'following'],
-                message=ERROR_MESSAGE_ALREADY_SIGNED
-            )
-        ]

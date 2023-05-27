@@ -1,7 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from yatube_api.settings import POST_IMAGE_PATH
+from django.conf import settings
+
+POST_IMAGE_PATH = settings.POST_IMAGE_PATH
 
 User = get_user_model()
 
@@ -57,3 +59,6 @@ class Follow(models.Model):
         related_name='following',
         null=True,
     )
+
+    class Meta:
+        unique_together = ('user', 'following')

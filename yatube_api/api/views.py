@@ -2,8 +2,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins, permissions, filters
 from rest_framework.pagination import LimitOffsetPagination
 
-from posts.models import Group, Post, Comment, Follow
-from .permissions import OwnerOrReadOnly, ReadOnly
+from posts.models import Group, Post, Comment
+from .permissions import OwnerOrReadOnlyPermission, ReadOnlyPermission
 
 from .serializers import (
     GroupSerializer,
@@ -29,7 +29,7 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = (OwnerOrReadOnly,)
+    permission_classes = (OwnerOrReadOnlyPermission,)
     pagination_class = LimitOffsetPagination
 
     def perform_create(self, serializer):
@@ -37,13 +37,13 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action == 'retrieve':
-            return (ReadOnly(),)
+            return (ReadOnlyPermission(),)
         return super().get_permissions()
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
-    permission_classes = (OwnerOrReadOnly,)
+    permission_classes = (OwnerOrReadOnlyPermission,)
     serializer_class = CommentSerializer
 
     def get_queryset(self):
@@ -59,7 +59,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action == 'retrieve':
-            return (ReadOnly(),)
+            return (ReadOnlyPermission(),)
         return super().get_permissions()
 
 
@@ -70,7 +70,7 @@ class FollowViewSet(ListCreateViewset):
     search_fields = ('following__username',)
 
     def get_queryset(self):
-        new_queryset = Follow.objects.filter(user=self.request.user)
+        new_queryset = self.request.user.follower.all()
         return new_queryset
 
     def perform_create(self, serializer):
